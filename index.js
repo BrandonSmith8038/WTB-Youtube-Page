@@ -16,12 +16,15 @@ fetch(
       output += `
         <div class="col-md-3">
           <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="${thumbnail}" alt="Card image cap">
+          <div class="video-thumb">
+              <img class="card-img-top" src="${thumbnail}" alt="Card image cap">
+            <div class="overlay" data-id="${id}">
+              <div class="play-icon"><i class="far fa-play-circle fa-7x"></i></div>
+            </div>
+          </div>
             <div class="card-body">
               <h5 class="card-title">${title}</h5>
               <p class="card-text">${truncateText(description, 100)}....</p>
-              <a href="#" class="btn btn-primary btn-block">View More</a>
-              <a href="#" target='_blank' id="${id}" class="btn btn-block btn-dark watch-btn">Watch</a>
             </div>
           </div>
         </div>
@@ -31,12 +34,21 @@ fetch(
     videoArea.innerHTML = output;
   })
   .then(data => {
-    const watchBtns = document.querySelectorAll('.watch-btn');
+    const watchBtns = document.querySelectorAll('.overlay');
     watchBtns.forEach(btn =>
       btn.addEventListener('click', e => {
-        e.preventDefault();
-        const id = e.target.id;
+        let overlay = '';
+        if (e.target.tagName === 'path') {
+          overlay = e.target.parentElement.parentElement.parentElement;
+        } else if (e.target.tagName === 'svg') {
+          overlay = e.target.parentElement.parentElement;
+        } else if (e.target.tagName === 'DIV') {
+          overlay = e.target;
+        }
+
+        const id = overlay.dataset.id;
         player.loadVideoById(id, 0, 'large');
+        e.preventDefault();
       })
     );
   });
